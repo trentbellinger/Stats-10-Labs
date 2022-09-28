@@ -1,0 +1,109 @@
+## Exercise 1
+
+# 1a
+# H0: p = 0.10, Ha: p > 0.10. This is a one-sided test.
+
+# 1b
+flint <- read.csv('flint_2015.csv')
+
+n <- nrow(flint)
+dangerous_lead <- flint$Pb >= 15
+phat <- mean(dangerous_lead)
+phat
+sample_sd <- sd(dangerous_lead)
+sample_sd
+# The sample proportion of dangerous lead levels is about 12% with a sample standard
+# deviation of about 0.33.
+
+# 1c
+p0 <- 0.10
+se <- sqrt(p0*(1-p0)/n)
+se
+
+z_stat <- (phat - p0)/se
+z_stat
+
+# comment on values...
+
+# 1d
+p_value <- 1 - pnorm(z_stat)
+p_value
+
+# 1e
+
+# Yes we reject the null at a 0.05 significance level. This is because our calculated 
+# p value is 0.0322, which is less than the 0.05 significance.
+
+# 1f
+
+# Conditions for CLT: 
+# 1. simple random sample
+# 2. Large sample is satisfied because we have n*p0 > 10 and n*(1-p0) > 10
+# 3. Large population is satisfied because the population of Flint is greater than 10*541 = 54100.
+
+# Since the validity conditions for CLT hold and we have rejected the null at 5% confidence we can
+# be fairly confident that the true population proportion of households with dangerous lead levels is greater than
+# 10% in Flint. Yes, the EPA should be contacted.
+
+# 1g
+prop.test(x=sum(dangerous_lead), n=n, p=p0, alt='greater')
+# The p value calculated by prop.test is slightly different than our hand calculated p value. This is due to the
+# continuity correction done by prop.test. However as the calculated p value is still under 5% this does not
+# change our conclusion of contacting the EPA.
+
+# 1h
+prop.test(x=sum(dangerous_lead), n=n, p=p0, alt='greater', conf.level = 0.99)
+# The 99% confidence interval includes the null proportion of 0.10, as we are not confident at the 1% level.
+
+## Exercise 2
+
+# 2a
+# H0: p_N = p_S
+# Ha: p_N != p_S
+# This is a two-sided test because we have a not equals in the alternative.
+
+# 2b
+count_N <- sum(dangerous_lead & flint$Region == 'North')
+count_N
+count_S <- sum(dangerous_lead) - count_N
+count_S
+
+n_N = sum(flint$Region == 'North')
+n_N
+n_S = n - n_N
+n_S
+p_N <- count_N / n_N
+p_N
+p_S <- count_S / n_S
+p_S
+
+se <- sqrt(phat*(1-phat)*(1/n_N + 1/n_S))
+se
+z_stat <- (p_N - p_S)/se
+z_stat
+
+# 2c
+p_value <- (1 - pnorm(z_stat))*2
+p_value
+
+# 2d
+# Validity conditions:
+# 1. Assume that the Flint dataset is made of random sample that are independent of each other
+# and independent within sampling groups.
+# 2. All sample proportions satisfy the large sample criterion.
+# 3. Each population (North and South) is 10 times as large as its sample.
+
+# Since the validity conditions are satisfied and our p value is less than 5%, we reject
+# the null at significance level 0.05. In the context of our research question, this says
+# that the north of Flint and the South of Flint experience significantly different levels of
+# dangerous lead.
+
+# 2e
+prop.test(x=c(count_N, count_S), n=c(n_N, n_S), alt='two.sided')
+# The p values are slightly different due to the continuity correction. This correction 
+# does not change the end conclusion, since the new p value is still less than 5%.
+
+
+
+
+
