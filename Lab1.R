@@ -1,0 +1,108 @@
+## Section 1
+
+## 1a
+heights <- c(71, 70, 64)
+heights
+
+# 1b
+names <- c("Trent", "John", "Jill")
+names
+
+# 1c
+two_columns <- cbind(heights, names)
+two_columns
+# Binded the two data vectors into columns of a table.
+
+class(two_columns)
+# The class of this new object is a matrix (and/or array).
+
+# 2a
+NCbirths <- read.csv('births.csv')
+
+# 2b 
+head(NCbirths)
+
+# 3a
+install.packages('maps')
+find.package('maps')
+
+# 3b
+library(maps)
+map('state')
+
+# 4a
+weights <- NCbirths$weight
+
+# 4b
+# Weights are in ounces.
+
+# 4c
+weights_in_pounds <- weights / 16
+
+# 4d
+weights_in_pounds[1:20]
+
+## Section 2
+install.packages('mosaic')
+library(mosaic)
+
+# 1
+mean(weights_in_pounds)
+
+# 2
+tally(NCbirths$Habit, format='percent')
+# About 9.4% of mothers in the sample smoke.
+
+# 3
+21 - tally(NCbirths$Habit, format='percent')[2]
+# We are about 12% off of the CDC estimate.
+
+## Section 3
+
+# 1
+dotPlot(weights_in_pounds)
+
+# 2
+hist(weights_in_pounds, breaks=2)
+hist(weights_in_pounds, breaks=19)
+hist(weights_in_pounds, breaks=99)
+
+# 3
+boxplot(NCbirths$Mage, NCbirths$Fage)
+# or
+boxplot(NCbirths[,c('Mage','Fage')])
+# The father's age on average (median) is higher than the mother.
+# There are also more upper outliers for the father than the mother.
+# Fathers tend to be older than mothers for our sample.
+
+# 4
+histogram(~ weight | Habit, data = NCbirths, layout = c(1, 2))
+# On average, babies from mothers who are not smokers weigh more on average.
+# There are more babies with low weights (~50 oz) for mothers who smoke.
+
+## Section 4
+tally(~BirthComp | Habit, data = NCbirths, format = "proportion")
+# We see that babies that have moms that are smokers are more likely to have
+# at least one birth complication.
+# This is significant because it is about a 40% increase in birth complications.
+
+## Section 5
+plot(NCbirths$weight ~ NCbirths$Mage, col = "blue", cex = 0.25, pch = 5, 
+     xlab = "Mother Age", ylab = "Baby Weight (oz.)", 
+     main = "Baby Weight vs. Mother Age")
+
+## Section 6
+
+a <- read.table("http://www.stat.ucla.edu/~nchristo/statistics12/ozone.txt", 
+                header=TRUE)
+
+library(maps)
+
+AQI_colors <- c("green", "yellow", "blue", "pink", "red")
+AQI_levels <- cut(a$o3, c(0, 0.06, 0.075, 0.104, 0.115, 0.374))
+
+plot(a$x, a$y, xlim=c(-125,-114),ylim=c(32,43), xlab="Longitude",
+     ylab="Latitude", main="California Ozone Bubble Plot", "n")
+map("county", "ca",add=TRUE)
+points(a$x,a$y, cex=a$o3/mean(a$o3),
+       col=AQI_colors[as.numeric(AQI_levels)], pch=17)
