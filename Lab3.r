@@ -1,0 +1,133 @@
+NCbirths <- read.csv('births.csv')
+
+## Run the linear model of weight against Mom's age and print a summary 
+linear_model <- lm(NCbirths$weight ~ NCbirths$Mage) 
+summary(linear_model) 
+
+## Create a plot of the data, and draw the regression line using abline 
+plot(NCbirths$weight ~ NCbirths$Mage, xlab = "Mom Age", ylab = "Weight", 
+     main = "Regression of Weight on Mother's Age") 
+abline(linear_model, col = "red", lwd = 2) 
+
+## Create a plot of the residuals to assess regression assumptions 
+plot(linear_model$residuals ~ NCbirths$Mage, main = "Residuals plot") 
+## Add a line of y = 0 to help visualize the residuals 
+abline(a = 0, b = 0, col = "red", lwd = 2)
+
+# Linear Model Assumptions:
+## 1. Data follows a linear path or y is linear in x
+## 2. x-symmetry in the residuals
+## 3. Equal variance in the resdiuals (error independent from x value)
+
+# Exercise 1
+
+soil <- read.table('soil_complete.txt', header = TRUE)
+
+# 1a
+soil_model <- lm(lead~zinc, data=soil)
+summary(soil_model)
+
+# 1b
+plot(lead~zinc, data=soil, xlab = 'Zinc Concentration [ppm]', ylab = 'Lead Concentration [ppm]', 
+     main = 'Lead vs. Zinc')
+abline(soil_model, col = 'red', lwd = 2)
+
+# 1c
+plot(soil_model$residuals~soil$zinc, xlab = 'Zinc [ppm]', ylab = 'Residual', 
+     main = 'Residual Plot for Lead v Zinc')
+abline(0, 0, col = 'red', lwd = 2)
+
+# 1d
+# y = ax + b
+# lead = 0.29*zinc + 16.58
+
+# 1e
+# soil_coeffs <- soil_model$coefficients
+# soil_coeffs[1] + soil_coeffs[2] * 1000
+predict(soil_model, data.frame(zinc = 1000))
+
+# 1f
+soil_coeffs <- soil_model$coefficients
+soil_coeffs[2] * 100
+
+# 1g
+summary(soil_model) # Multiple r squared: 0.912, Adjusted r-squared: 0.9114
+cor(soil$zinc, soil$lead)^2
+# 91% of the variation in lead can be explained by the variation in zinc.
+
+# 1h
+# Linearity of the data is met as shown in subpart (b).
+# Symmetry is not respected as the residuals vary from -50 to 100.
+# This is not ignorable since the points above the x-axis and below the x-axis 
+# are of similar density.
+# Equal variance assumption is violated as we see a clear fan-shape of 
+# x-dependence between the residual and the x-variable.
+
+# Exercise 2
+
+ice <- read.csv("sea_ice.csv", header = TRUE)
+ice$Date <- as.Date(ice$Date, "%m/%d/%Y")
+
+# 2a
+
+ice_model <- lm(Extent~Date, data = ice)
+summary(ice_model)
+
+# 2b
+
+plot(Extent~Date, data = ice, xlab = "Date [yrs]", ylab = "Ice Extent [km^2]")
+abline(ice_model, col = 'red', lwd = 2)
+# Data does show a slight positive trend.
+
+# 2c
+plot(ice_model$residuals~ice$Date, xlab = "Date [yrs]", ylab = "Residual",
+     main = "Residual of Ice Model")
+abline(0, 0, col = 'red', lwd = 2)
+# First issue: data is not linear as can be seen in part 2(b)
+# Second Issue: there seems to be a lack of x-symmetry as the residuals range from
+# -10 to 5.
+# The equal variance assumption is respected. There is no x-dependence on residual variability.
+
+## Exercise 3
+
+# 3a
+# Total options: 6*6
+# Ways to sum to 7: 3+4, 4+3, 5+2, 2+5, 6+1, 1+6 => 6 options
+# Ways to sum to 11: 6+5, 5+6 => 2 options
+# Pr(W) = 8/36 = 2/9
+
+# Ways to sum to 2: 1+1 => 1 option
+# Ways to sum to 3: 1+2, 2+1 => 2 options
+# Ways to sum to 12: 6+6 => 1 option
+# Pr(L) = 4/36 = 1/9
+
+# The chance that Adam will double his money in the first round is 2/9...
+
+# 3b
+set.seed(123)
+dice <- 1:6
+outcomes <- replicate(5000, sample(dice, 2, replace=TRUE))
+roll_sums <- colSums(outcomes)
+barplot(table(roll_sums))
+
+# 3c
+prW <- mean((roll_sums == 7)|(roll_sums == 11))
+prW
+prL <- mean((roll_sums == 2)|(roll_sums == 3)|(roll_sums == 12))
+prL
+# The percentage of time Adam doubles his money was 21.88%.
+# The percentage of time Adam lost was 11.72%.
+
+# 3d
+# Independence: P(A and B) = P(A) * P(B) or P(A|B) = P(A) => P(A|B) = P(A and B)/P(B) = P(A)
+# Disjoint: P(A and B) = 0
+
+# Adam winning money and losing money are disjoint events. They cannot be independent as well 
+# since either winning or losing has a non-zero probability of happening.
+
+# 3e
+W_event <- (roll_sums == 7)|(roll_sums == 11)
+L_event <- (roll_sums == 2)|(roll_sums == 3)|(roll_sums == 12)
+prWL <- mean(W_event & L_event)
+prWL
+prWL != (prW * prL)
